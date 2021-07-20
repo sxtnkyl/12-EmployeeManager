@@ -52,12 +52,12 @@ const updateEmployeeRole = [
   {
     type: "input",
     name: "id",
-    massage: "What is the employee's id?",
+    message: "What is the employee's id?",
   },
   {
     type: "input",
     name: "newRole",
-    massage: "What is the new role?",
+    message: "What is the new role?",
   },
 ];
 
@@ -65,7 +65,7 @@ const chooseTable = [
   {
     type: "list",
     name: "chooseTable",
-    massage: "For which table?",
+    message: "For which table?",
     choices: ["department", "depRole", "employee"],
   },
 ];
@@ -74,8 +74,17 @@ const chooseAction = [
   {
     type: "list",
     name: "chooseAction",
-    massage: "Would you like to add, view, or update?",
+    message: "Would you like to add, view, or update?",
     choices: ["add", "view", "update"],
+  },
+];
+
+const startOver = [
+  {
+    type: "list",
+    name: "startOver",
+    message: "Would you like to start over?",
+    choices: ["Yes", "No"],
   },
 ];
 
@@ -86,4 +95,5 @@ module.exports = {
   updateEmployeeRole,
   chooseTable,
   chooseAction,
+  startOver,
 };

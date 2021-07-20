@@ -1,52 +1,53 @@
-const inquirer = require("inquirer");
+const { prompt } = require("inquirer");
 const connect = require("./js/server");
 const prompts = require("./js/prompts");
 
+// const action = "";
+// const table = "";
+
+async function actionPrompt(a) {
+  return a == "update"
+    ? await prompt(prompts.updateEmployeeRole)
+    : await prompt(prompts.chooseTable);
+}
+
+async function addToTable(t) {
+  return t == "department"
+    ? await prompt(prompts.departmentPrompt)
+    : t == "depRole"
+    ? await prompt(prompts.depRolePrompt)
+    : await prompt(prompts.employeePrompt);
+}
+async function startOver() {
+  await prompt(prompts.startOver).then((ans) => {
+    ans.startOver == "Yes" ? init() : console.log("thanks!");
+  });
+}
+
 async function init() {
-  //"add", "view", "update"
-  let action;
-  //"department", "depRole", "employee"
-  let table;
-  await inquirer
-    .prompt(prompts.chooseAction)
-    .then((choice) => {
-      console.log("made a choice: ", choice);
-      action = choice.chooseAction;
-      return action == "update"
-        ? inquirer.prompt(prompts.updateEmployeeRole)
-        : inquirer.prompt(prompts.chooseTable);
-    })
-    .then((data) => {
-      console.log("got data: ", data);
-      if (data.chooseTable) {
-        table = data.chooseTable;
+  prompt(prompts.chooseAction).then((choice) => {
+    let action = choice.chooseAction;
+    actionPrompt(action).then((actionRes) => {
+      console.log("actionRes: ", actionRes);
+      if (actionRes.chooseTable) {
+        let table = actionRes.chooseTable;
         if (action == "view") {
-          connect.queryTable(table);
-          init();
+          connect.queryTable(table, init);
+          startOver();
         }
         if (action == "add") {
-          return table == "department"
-            ? inquirer.prompt(prompts.departmentPrompt)
-            : table == "depRole"
-            ? inquirer.prompt(prompts.depRolePrompt)
-            : inquirer.prompt(prompts.employeePrompt);
+          addToTable(table).then((tableRes) => {
+            connect.createItem(table, tableRes);
+            // init();
+          });
         }
       }
-      if (action == "update") {
-        //use id and newRole to update employee
-        let updoot = inquirer.prompt(prompts.updateEmployeeRole);
-        connect.updateEmployeeRole(table, updoot, init);
+      if (actionRes.id) {
+        connect.updateEmployeeRole(table, actionRes);
+        // init();
       }
-    })
-    .then((addRes) => {
-      console.log("got a response: ", addRes);
-      addRes.depName
-        ? connect.createItem("department", addRes)
-        : addRes.roleTitle
-        ? connect.createItem("depRole", addRes)
-        : connect.createItem("employee", addRes);
-    })
-    .catch((err) => console.log(err));
+    });
+  });
 }
 
 init();
