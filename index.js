@@ -2,9 +2,6 @@ const { prompt } = require("inquirer");
 const connect = require("./js/server");
 const prompts = require("./js/prompts");
 
-// const action = "";
-// const table = "";
-
 async function actionPrompt(a) {
   return a == "update"
     ? await prompt(prompts.updateEmployeeRole)
@@ -38,13 +35,13 @@ async function init() {
         if (action == "add") {
           addToTable(table).then((tableRes) => {
             connect.createItem(table, tableRes);
-            // init();
+            startOver();
           });
         }
       }
       if (actionRes.id) {
-        connect.updateEmployeeRole(table, actionRes);
-        // init();
+        connect.updateEmployeeRole(actionRes);
+        startOver();
       }
     });
   });

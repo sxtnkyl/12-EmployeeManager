@@ -1,17 +1,14 @@
 require("dotenv").config();
+require("console.table");
 const mysql = require("mysql");
 const util = require("util");
-const cTable = require("console.table");
 
 const connection = mysql.createConnection({
-  host: "localhost",
-
-  port: 3306,
-
-  user: "root",
-
+  host: process.env.HOST,
+  port: process.env.PORT,
+  user: process.env.USER,
   password: process.env.MYSQLPASSWORD,
-  database: "EmployeeTracker",
+  database: process.env.DBNAME,
 });
 
 //https://stackoverflow.com/questions/56242450/use-async-with-nodejs-mysql-driver
@@ -27,23 +24,22 @@ const queryTable = async (table) => {
     if (err) throw err;
     console.log("table found: ", res);
     //res > {}
-    // cTable(res)
+    console.table(res);
   }).catch((err) => console.log("query error: ", err));
 };
 
 const createItem = async (table, obj) => {
   //table > string of department, depRole, or employee
-  console.log("creating item: ", obj, " in table ", table);
   await asyncQuery(`INSERT INTO ${table} SET ?`, obj, (err, res) => {
     if (err) throw err;
     console.log("created item: ", res);
   }).catch((err) => console.log("create error: ", err));
 };
 
-const updateEmployeeRole = async (table, { id, role_id }) => {
+const updateEmployeeRole = async ({ newRole, id }) => {
   await asyncQuery(
-    `UPDATE ${table} SET role_id = ? WHERE id = ?`,
-    [role_id, id],
+    `UPDATE employee SET role_id = ? WHERE id = ?`,
+    [newRole, id],
     (err, res) => {
       if (err) throw err;
       console.log("updated employee role: ", res);
